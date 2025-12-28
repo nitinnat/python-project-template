@@ -148,7 +148,7 @@ class FeatureFlagService:
             description=data.description,
             enabled=data.enabled,
             category=data.category,
-            metadata=data.metadata,
+            config=data.metadata,
         )
 
         self.session.add(flag)
@@ -189,7 +189,7 @@ class FeatureFlagService:
         if data.category is not None:
             flag.category = data.category
         if data.metadata is not None:
-            flag.metadata = data.metadata
+            flag.config = data.metadata
 
         await self.session.commit()
         await self.session.refresh(flag)
@@ -225,13 +225,13 @@ class FeatureFlagService:
         if flag:
             flag.enabled = enabled
             if metadata:
-                flag.metadata = metadata
+                flag.config = metadata
         else:
             flag = FeatureFlag(
                 key=key,
                 name=key.replace(".", " ").replace("_", " ").title(),
                 enabled=enabled,
-                metadata=metadata,
+                config=metadata,
             )
             self.session.add(flag)
 
