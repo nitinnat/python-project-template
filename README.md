@@ -104,7 +104,7 @@ This template provides a **production-ready foundation** for building modern ful
 | **OpenAI** | GPT-4, GPT-3.5 | 🔑 API key required |
 | **Anthropic** | Claude 3 Opus, Sonnet | 🔑 API key required |
 | **Google** | Gemini Flash | 🔑 API key required |
-| **Ollama** | qwen2.5:7b (local) | ✅ Included (11GB) |
+| **Ollama** | qwen2.5:7b (chat), nomic-embed-text (embeddings) | ✅ Auto-pulled on start |
 | **LiteLLM** | Unified interface | ✅ Configured |
 
 ### 🎛️ Advanced Features
@@ -403,7 +403,7 @@ The template is running with:
 - ✅ Backend API at http://localhost:8000
 - ✅ Frontend UI at http://localhost:5173
 - ✅ All databases connected
-- ✅ Local LLM available (Ollama with qwen2.5:7b)
+- ✅ Local LLMs available (Ollama: qwen2.5:7b chat + nomic-embed-text embeddings)
 - ✅ Hot reload enabled for development
 
 ---
@@ -699,25 +699,28 @@ The template includes **4 LLM providers** out-of-the-box with a unified interfac
 
 ### Ollama (Local LLM) - Pre-configured ✅
 
-**No API key needed!** Runs entirely on your machine.
+**No API key needed!** Runs entirely on your machine. Auto-pulls models on first start.
+
+**Chat Model:** `qwen2.5:7b` (7B parameters, ~4.7GB)
+- Fast inference on modern CPUs/GPUs
+- General-purpose chat and completion tasks
+
+**Embedding Model:** `nomic-embed-text` (~274MB)
+- High-quality text embeddings (768 dimensions)
+- Semantic search, RAG, clustering
 
 ```bash
-# Test Ollama (already includes qwen2.5:7b model)
-docker compose exec backend python -c "
-import asyncio
-from app.helpers.llm.ollama_client import ollama_client
+# Test chat model
+docker compose exec ollama ollama run qwen2.5:7b "Hello!"
 
-async def test():
-    response = await ollama_client.generate('Say hello from the template!')
-    print(response['content'])
+# Test embedding model
+docker compose exec ollama ollama run nomic-embed-text "Generate embeddings"
 
-asyncio.run(test())
-"
+# List available models
+docker compose exec ollama ollama list
 ```
 
-**Model:** `qwen2.5:7b` (7 billion parameters, ~11GB)
-**Performance:** Fast inference on modern CPUs/GPUs
-**Use cases:** Development, testing, privacy-sensitive applications
+**Use cases:** Development, testing, privacy-sensitive applications, offline AI
 
 ### Google Gemini
 
