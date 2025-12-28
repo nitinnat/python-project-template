@@ -23,11 +23,36 @@ RUN pip install poetry==1.7.1
 # Copy dependency files
 COPY pyproject.toml ./
 
-# Install Python dependencies with all extras
+# Accept build arguments for individual extras
+ARG ENABLE_MONGODB=false
+ARG ENABLE_NEO4J=false
+ARG ENABLE_CELERY_WORKER=false
+ARG ENABLE_LLM_OPENAI=false
+ARG ENABLE_LLM_ANTHROPIC=false
+ARG ENABLE_LLM_GOOGLE=false
+ARG ENABLE_LLM_LITELLM=false
+ARG ENABLE_LLM_LANGCHAIN=false
+
+# Install Python dependencies with selected extras based on enabled features
 # Generate lock file if it doesn't exist, then install
 RUN poetry config virtualenvs.create false \
     && ([ -f poetry.lock ] || poetry lock) \
-    && poetry install --no-interaction --no-ansi --no-root --all-extras
+    && EXTRAS=""; \
+    [ "$ENABLE_MONGODB" = "true" ] && EXTRAS="$EXTRAS mongodb"; \
+    [ "$ENABLE_NEO4J" = "true" ] && EXTRAS="$EXTRAS neo4j"; \
+    [ "$ENABLE_CELERY_WORKER" = "true" ] && EXTRAS="$EXTRAS celery"; \
+    [ "$ENABLE_LLM_OPENAI" = "true" ] && EXTRAS="$EXTRAS openai"; \
+    [ "$ENABLE_LLM_ANTHROPIC" = "true" ] && EXTRAS="$EXTRAS anthropic"; \
+    [ "$ENABLE_LLM_GOOGLE" = "true" ] && EXTRAS="$EXTRAS google"; \
+    [ "$ENABLE_LLM_LITELLM" = "true" ] && EXTRAS="$EXTRAS litellm"; \
+    [ "$ENABLE_LLM_LANGCHAIN" = "true" ] && EXTRAS="$EXTRAS langchain"; \
+    if [ -n "$EXTRAS" ]; then \
+      echo "Installing with extras:$EXTRAS"; \
+      poetry install --no-interaction --no-ansi --no-root $(echo $EXTRAS | sed 's/ / --extras /g' | sed 's/^/--extras /'); \
+    else \
+      echo "Installing base dependencies only"; \
+      poetry install --no-interaction --no-ansi --no-root; \
+    fi
 
 # Copy application code
 COPY . .
