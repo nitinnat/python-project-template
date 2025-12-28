@@ -181,18 +181,23 @@ services:
         until ollama list > /dev/null 2>&1; do sleep 2; done
         echo "Ollama server ready"
 
-        # Pull chat model if not exists
-        echo "Checking qwen2.5:7b..."
-        if ! ollama list | grep -q "qwen2.5:7b"; then
-          echo "Pulling qwen2.5:7b..."
-          ollama pull qwen2.5:7b
-        fi
-
-        # Pull embedding model if not exists
-        echo "Checking nomic-embed-text..."
-        if ! ollama list | grep -q "nomic-embed-text"; then
-          echo "Pulling nomic-embed-text..."
-          ollama pull nomic-embed-text
+        # Pull models from OLLAMA_MODELS environment variable (comma-separated)
+        if [ -n "$OLLAMA_MODELS" ]; then
+          IFS=',' read -ra MODELS <<< "$OLLAMA_MODELS"
+          for model in "${MODELS[@]}"; do
+            model=$(echo "$model" | xargs)  # Trim whitespace
+            if [ -n "$model" ]; then
+              echo "Checking $model..."
+              if ! ollama list | grep -q "$model"; then
+                echo "Pulling $model..."
+                ollama pull "$model"
+              else
+                echo "$model already exists"
+              fi
+            fi
+          done
+        else
+          echo "No models specified in OLLAMA_MODELS"
         fi
 
         echo "Ollama initialization complete"

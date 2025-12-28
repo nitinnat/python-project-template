@@ -341,29 +341,39 @@ cp .env.example .env
 # Ollama works out-of-the-box without API keys!
 ```
 
-### 3️⃣ Choose Your Setup
+### 3️⃣ Choose Your Setup Profile
 
-#### Option A: Full Stack (Recommended)
-All features enabled: Frontend, Backend, Databases, Ollama LLM
+Pick a pre-configured profile based on your needs (see [profiles/](profiles/) for details):
 
 ```bash
-./scripts/quick-start.sh
-# or
+# 🚀 Minimal - Simple API (Backend + PostgreSQL + Redis)
+cp profiles/minimal.env features.env
+
+# 🌐 Full-Stack - Web app with React frontend
+cp profiles/fullstack.env features.env
+
+# 🤖 AI Local - Ollama with chat + embeddings models
+cp profiles/ai-local.env features.env
+
+# ☁️ AI Cloud - OpenAI + Anthropic + Google APIs
+cp profiles/ai-cloud.env features.env
+
+# 📊 Data Platform - PostgreSQL + MongoDB + Neo4j
+cp profiles/data-platform.env features.env
+
+# ⚡ Async Tasks - Celery background jobs
+cp profiles/async-tasks.env features.env
+
+# 🎯 Everything - All features (15GB)
+cp profiles/everything.env features.env
+
+# Then start
 make dev
 ```
 
-#### Option B: Minimal (API Only)
-Just backend + PostgreSQL + Redis
-
+**Or use default setup:**
 ```bash
-docker compose -f docker-compose.minimal.yml up
-```
-
-#### Option C: Custom Configuration
-Edit `features.env` to enable/disable specific services, then:
-
-```bash
-make dev
+make dev  # Uses existing features.env
 ```
 
 ### 4️⃣ Access Your Application
@@ -701,14 +711,20 @@ The template includes **4 LLM providers** out-of-the-box with a unified interfac
 
 **No API key needed!** Runs entirely on your machine. Auto-pulls models on first start.
 
-**Chat Model:** `qwen2.5:7b` (7B parameters, ~4.7GB)
-- Fast inference on modern CPUs/GPUs
-- General-purpose chat and completion tasks
+**Configure Models:**
+Set `OLLAMA_MODELS` in `.env` with comma-separated model names (default: `qwen2.5:7b,nomic-embed-text`)
 
-**Embedding Model:** `nomic-embed-text` (~274MB)
-- High-quality text embeddings (768 dimensions)
-- Semantic search, RAG, clustering
+```bash
+# .env
+OLLAMA_MODELS=qwen2.5:7b,nomic-embed-text
+# Or use different models: llama3.3:70b,codellama,mistral
+```
 
+**Default Models:**
+- **Chat:** `qwen2.5:7b` (7B parameters, ~4.7GB) - Fast inference, general-purpose
+- **Embeddings:** `nomic-embed-text` (~274MB) - 768-dim vectors for RAG, search
+
+**Test Models:**
 ```bash
 # Test chat model
 docker compose exec ollama ollama run qwen2.5:7b "Hello!"

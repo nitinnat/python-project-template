@@ -60,7 +60,7 @@ This document outlines the technical design for a comprehensive Python full-stac
 | APIs exposed | Limited | Live routes: `/health`, `/api/v1/documents/*` (requires MongoDB profile) and `/api/v1/graph/*` (requires Neo4j profile). |
 | Background tasks & LLM | Stubbed | Celery workers, RabbitMQ, and LLM clients exist but are not exercised by current API surface. |
 | Data stores | Mixed | Postgres + Redis always provisioned; MongoDB/Neo4j require compose profiles; PGVector enabled flag exists but no vectors written today. |
-| LLMs | Partial | Gemini client available (needs valid Google/Gemini API key); Ollama container added with `qwen2.5:7b` pulled; backend uses `OLLAMA_HOST` default. |
+| LLMs | Partial | Gemini client available (needs valid Google/Gemini API key); Ollama container with configurable models (default: `qwen2.5:7b`, `nomic-embed-text`); backend uses `OLLAMA_HOST` default. |
 | Tests | Missing | `backend/tests` folders are empty. TESTING docs still describe removed auth flows. |
 
 Use this table as the source of truth for what currently runs out-of-the-box.
@@ -127,7 +127,7 @@ Use this table as the source of truth for what currently runs out-of-the-box.
 - **OpenAI SDK**: ChatGPT integration
 - **Anthropic SDK**: Claude integration
 - **Google GenAI SDK**: Gemini integration (requires valid GOOGLE_API_KEY or GEMINI_API_KEY)
-- **Ollama**: Local LLM integration (Dockerized; qwen2.5:7b pulled)
+- **Ollama**: Local LLM integration (Dockerized; configurable models via `OLLAMA_MODELS` env var, defaults: `qwen2.5:7b`, `nomic-embed-text`)
 
 ### DevOps & Quality
 - **Ruff**: Fast Python linter
@@ -623,7 +623,33 @@ ENABLE_LLM_LITELLM=true
 ENABLE_LLM_LANGCHAIN=false
 ```
 
-#### 7.2.2 Docker Compose Profile System
+#### 7.2.2 Pre-Configured Profiles
+
+The template provides ready-to-use configuration profiles in the `/profiles` directory for common use cases:
+
+| Profile | Use Case | Containers | Dependencies | Size |
+|---------|----------|------------|--------------|------|
+| `minimal.env` | Simple REST APIs | 3 (Backend, PostgreSQL, Redis) | Base only | ~500MB |
+| `fullstack.env` | Web applications | 5 (+ Frontend, Nginx) | Base only | ~1GB |
+| `ai-local.env` | Local AI/ML | 4 (+ Ollama w/ models) | Base only | ~5GB |
+| `ai-cloud.env` | Cloud AI APIs | 3 | Base + LLM SDKs | ~800MB |
+| `data-platform.env` | Multi-database | 5 (+ MongoDB, Neo4j) | Base + DB drivers | ~2GB |
+| `async-tasks.env` | Background jobs | 6 (+ RabbitMQ, Celery) | Base + Celery | ~1GB |
+| `everything.env` | Full exploration | 11 (all services) | All packages | ~15GB |
+
+**Usage:**
+```bash
+# Copy desired profile
+cp profiles/ai-local.env features.env
+
+# Start services
+make dev
+```
+
+**Customization:**
+Users can copy a profile and modify it to fit their exact needs, combining features from multiple profiles.
+
+#### 7.2.3 Docker Compose Profile System
 
 The `docker-compose.yml` uses Docker Compose **profiles** to conditionally start services:
 
@@ -1726,6 +1752,8 @@ GOOGLE_API_KEY=your-google-api-key
 
 # Ollama
 OLLAMA_HOST=http://host.docker.internal:11434
+# Comma-separated list of models to auto-pull on startup
+OLLAMA_MODELS=qwen2.5:7b,nomic-embed-text
 
 # JWT
 JWT_SECRET_KEY=your-jwt-secret
