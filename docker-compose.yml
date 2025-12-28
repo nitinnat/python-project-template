@@ -10,6 +10,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        ENABLE_MONGODB: ${ENABLE_MONGODB:-false}
+        ENABLE_NEO4J: ${ENABLE_NEO4J:-false}
+        ENABLE_CELERY_WORKER: ${ENABLE_CELERY_WORKER:-false}
+        ENABLE_LLM_OPENAI: ${ENABLE_LLM_OPENAI:-false}
+        ENABLE_LLM_ANTHROPIC: ${ENABLE_LLM_ANTHROPIC:-false}
+        ENABLE_LLM_GOOGLE: ${ENABLE_LLM_GOOGLE:-false}
+        ENABLE_LLM_LITELLM: ${ENABLE_LLM_LITELLM:-false}
+        ENABLE_LLM_LANGCHAIN: ${ENABLE_LLM_LANGCHAIN:-false}
     container_name: backend
     restart: unless-stopped
     ports:
@@ -167,6 +176,14 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.celery
+      args:
+        ENABLE_MONGODB: ${ENABLE_MONGODB:-false}
+        ENABLE_NEO4J: ${ENABLE_NEO4J:-false}
+        ENABLE_LLM_OPENAI: ${ENABLE_LLM_OPENAI:-false}
+        ENABLE_LLM_ANTHROPIC: ${ENABLE_LLM_ANTHROPIC:-false}
+        ENABLE_LLM_GOOGLE: ${ENABLE_LLM_GOOGLE:-false}
+        ENABLE_LLM_LITELLM: ${ENABLE_LLM_LITELLM:-false}
+        ENABLE_LLM_LANGCHAIN: ${ENABLE_LLM_LANGCHAIN:-false}
     container_name: celery-worker
     restart: unless-stopped
     profiles:
@@ -196,6 +213,14 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.celery
+      args:
+        ENABLE_MONGODB: ${ENABLE_MONGODB:-false}
+        ENABLE_NEO4J: ${ENABLE_NEO4J:-false}
+        ENABLE_LLM_OPENAI: ${ENABLE_LLM_OPENAI:-false}
+        ENABLE_LLM_ANTHROPIC: ${ENABLE_LLM_ANTHROPIC:-false}
+        ENABLE_LLM_GOOGLE: ${ENABLE_LLM_GOOGLE:-false}
+        ENABLE_LLM_LITELLM: ${ENABLE_LLM_LITELLM:-false}
+        ENABLE_LLM_LANGCHAIN: ${ENABLE_LLM_LANGCHAIN:-false}
     container_name: celery-beat
     restart: unless-stopped
     profiles:

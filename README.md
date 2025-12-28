@@ -665,6 +665,8 @@ ENABLE_LLM_GOOGLE=false
 make dev
 ```
 
+**Optimized Dependencies:** Feature flags automatically control which Python dependencies are installed during build. Disabling MongoDB/Neo4j/LLM providers in `features.env` skips their corresponding packages, reducing build time by 50%+ and container size significantly.
+
 ### Runtime Flags (Admin UI)
 
 Control **application features** without restarting:
@@ -724,18 +726,6 @@ asyncio.run(test())
 GOOGLE_API_KEY=your-key-here
 # or
 GEMINI_API_KEY=your-key-here
-
-# Test Gemini
-docker compose exec backend python -c "
-import asyncio
-from app.helpers.llm.gemini_client import gemini_client
-
-async def test():
-    result = await gemini_client.generate_content('Explain quantum computing')
-    print(result['content'])
-
-asyncio.run(test())
-"
 ```
 
 **Model:** `gemini-1.5-flash-latest`
@@ -746,21 +736,6 @@ asyncio.run(test())
 ```bash
 # Set API key in .env
 OPENAI_API_KEY=sk-...
-
-# Test OpenAI
-docker compose exec backend python -c "
-import asyncio
-from app.helpers.llm.openai_client import openai_client
-
-async def test():
-    response = await openai_client.chat_completion(
-        messages=[{'role': 'user', 'content': 'Hello!'}],
-        model='gpt-4'
-    )
-    print(response['content'])
-
-asyncio.run(test())
-"
 ```
 
 **Models:** GPT-4, GPT-4 Turbo, GPT-3.5 Turbo
@@ -771,21 +746,6 @@ asyncio.run(test())
 ```bash
 # Set API key in .env
 ANTHROPIC_API_KEY=sk-ant-...
-
-# Test Claude
-docker compose exec backend python -c "
-import asyncio
-from app.helpers.llm.anthropic_client import anthropic_client
-
-async def test():
-    response = await anthropic_client.create_message(
-        messages=[{'role': 'user', 'content': 'Hello!'}],
-        model='claude-3-opus-20240229'
-    )
-    print(response['content'])
-
-asyncio.run(test())
-"
 ```
 
 **Models:** Claude 3 Opus, Sonnet, Haiku
