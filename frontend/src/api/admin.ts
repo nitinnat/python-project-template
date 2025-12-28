@@ -36,7 +36,7 @@ export const adminApi = {
    * Get system health status
    */
   async getSystemHealth(): Promise<SystemHealth> {
-    const response = await apiClient.get<SystemHealth>('/admin/health');
-    return response.data;
+    const response = await apiClient.get<{ services: SystemHealth }>('/health/services');
+    return response.data.services;
   },
 };

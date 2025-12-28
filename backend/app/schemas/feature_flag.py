@@ -48,7 +48,26 @@ class FeatureFlagResponse(FeatureFlagBase):
     created_at: datetime
     updated_at: datetime | None
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
+
+    @classmethod
+    def model_validate(cls, obj: Any) -> "FeatureFlagResponse":
+        """Custom validation to map config -> metadata."""
+        if hasattr(obj, "config"):
+            # Create a dict and map config to metadata
+            data = {
+                "id": obj.id,
+                "key": obj.key,
+                "name": obj.name,
+                "description": obj.description,
+                "category": obj.category,
+                "metadata": obj.config,  # Map config to metadata
+                "enabled": obj.enabled,
+                "created_at": obj.created_at,
+                "updated_at": obj.updated_at,
+            }
+            return super().model_validate(data)
+        return super().model_validate(obj)
 
 
 class FeatureFlagList(BaseModel):

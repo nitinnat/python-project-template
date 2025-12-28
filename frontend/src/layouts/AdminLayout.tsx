@@ -1,6 +1,5 @@
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Flag, Activity, Users, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Flag, Activity, Users, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const adminMenuItems = [
@@ -27,14 +26,7 @@ const adminMenuItems = [
 ];
 
 export function AdminLayout() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,17 +44,11 @@ export function AdminLayout() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <p className="font-medium text-gray-900">{user?.email}</p>
-                <p className="text-gray-500 capitalize">{user?.role}</p>
+              <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800 font-medium">
+                  Auth disabled - Dev mode
+                </p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
             </div>
           </div>
         </div>

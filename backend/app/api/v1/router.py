@@ -6,9 +6,15 @@ Combines all v1 endpoints.
 
 from fastapi import APIRouter
 
-from app.api.v1 import documents, graph
+from app.api.v1 import admin, documents, graph, health
 
 api_router = APIRouter()
+
+# Include health routes
+api_router.include_router(health.router)
+
+# Include admin routes
+api_router.include_router(admin.router)
 
 # Include document routes
 api_router.include_router(documents.router)

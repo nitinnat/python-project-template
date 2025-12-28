@@ -1,18 +1,7 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { Link, Outlet } from 'react-router-dom';
+import { LayoutDashboard, Settings } from 'lucide-react';
 
 export function MainLayout() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const isAdmin = user?.role === 'admin';
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
@@ -34,30 +23,22 @@ export function MainLayout() {
                 >
                   Dashboard
                 </Link>
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Admin
-                  </Link>
-                )}
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin
+                </Link>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="text-sm text-right">
-                <p className="font-medium text-gray-900">{user?.email}</p>
-                <p className="text-gray-500 capitalize">{user?.role}</p>
+              <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800 font-medium">
+                  Auth disabled - Dev mode
+                </p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
             </div>
           </div>
         </div>
