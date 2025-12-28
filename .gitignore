@@ -129,3 +129,6 @@ rabbitmq_data/
 # Jupyter
 .ipynb_checkpoints
 *.ipynb
+
+# Documentation (excluding main docs)
+docs/
