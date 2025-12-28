@@ -170,6 +170,41 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Start Ollama server in background
+        /bin/ollama serve &
+
+        # Wait for Ollama to be ready
+        echo "Waiting for Ollama server..."
+        until ollama list > /dev/null 2>&1; do sleep 2; done
+        echo "Ollama server ready"
+
+        # Pull models from OLLAMA_MODELS environment variable (comma-separated)
+        if [ -n "$OLLAMA_MODELS" ]; then
+          IFS=',' read -ra MODELS <<< "$OLLAMA_MODELS"
+          for model in "${MODELS[@]}"; do
+            model=$(echo "$model" | xargs)  # Trim whitespace
+            if [ -n "$model" ]; then
+              echo "Checking $model..."
+              if ! ollama list | grep -q "$model"; then
+                echo "Pulling $model..."
+                ollama pull "$model"
+              else
+                echo "$model already exists"
+              fi
+            fi
+          done
+        else
+          echo "No models specified in OLLAMA_MODELS"
+        fi
+
+        echo "Ollama initialization complete"
+        ollama list
+
+        # Keep container running
+        wait
 
   # Celery Worker (optional - profile: celery)
   celery-worker:

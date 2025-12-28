@@ -46,6 +46,7 @@ env/
 *.env
 !.env.example
 !features.env*
+!profiles/*.env
 
 # Secrets/keys
 .envrc

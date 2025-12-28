@@ -104,7 +104,7 @@ This template provides a **production-ready foundation** for building modern ful
 | **OpenAI** | GPT-4, GPT-3.5 | 🔑 API key required |
 | **Anthropic** | Claude 3 Opus, Sonnet | 🔑 API key required |
 | **Google** | Gemini Flash | 🔑 API key required |
-| **Ollama** | qwen2.5:7b (local) | ✅ Included (11GB) |
+| **Ollama** | qwen2.5:7b (chat), nomic-embed-text (embeddings) | ✅ Auto-pulled on start |
 | **LiteLLM** | Unified interface | ✅ Configured |
 
 ### 🎛️ Advanced Features
@@ -341,29 +341,39 @@ cp .env.example .env
 # Ollama works out-of-the-box without API keys!
 ```
 
-### 3️⃣ Choose Your Setup
+### 3️⃣ Choose Your Setup Profile
 
-#### Option A: Full Stack (Recommended)
-All features enabled: Frontend, Backend, Databases, Ollama LLM
+Pick a pre-configured profile based on your needs (see [profiles/](profiles/) for details):
 
 ```bash
-./scripts/quick-start.sh
-# or
+# 🚀 Minimal - Simple API (Backend + PostgreSQL + Redis)
+cp profiles/minimal.env features.env
+
+# 🌐 Full-Stack - Web app with React frontend
+cp profiles/fullstack.env features.env
+
+# 🤖 AI Local - Ollama with chat + embeddings models
+cp profiles/ai-local.env features.env
+
+# ☁️ AI Cloud - OpenAI + Anthropic + Google APIs
+cp profiles/ai-cloud.env features.env
+
+# 📊 Data Platform - PostgreSQL + MongoDB + Neo4j
+cp profiles/data-platform.env features.env
+
+# ⚡ Async Tasks - Celery background jobs
+cp profiles/async-tasks.env features.env
+
+# 🎯 Everything - All features (15GB)
+cp profiles/everything.env features.env
+
+# Then start
 make dev
 ```
 
-#### Option B: Minimal (API Only)
-Just backend + PostgreSQL + Redis
-
+**Or use default setup:**
 ```bash
-docker compose -f docker-compose.minimal.yml up
-```
-
-#### Option C: Custom Configuration
-Edit `features.env` to enable/disable specific services, then:
-
-```bash
-make dev
+make dev  # Uses existing features.env
 ```
 
 ### 4️⃣ Access Your Application
@@ -403,7 +413,7 @@ The template is running with:
 - ✅ Backend API at http://localhost:8000
 - ✅ Frontend UI at http://localhost:5173
 - ✅ All databases connected
-- ✅ Local LLM available (Ollama with qwen2.5:7b)
+- ✅ Local LLMs available (Ollama: qwen2.5:7b chat + nomic-embed-text embeddings)
 - ✅ Hot reload enabled for development
 
 ---
@@ -699,25 +709,34 @@ The template includes **4 LLM providers** out-of-the-box with a unified interfac
 
 ### Ollama (Local LLM) - Pre-configured ✅
 
-**No API key needed!** Runs entirely on your machine.
+**No API key needed!** Runs entirely on your machine. Auto-pulls models on first start.
+
+**Configure Models:**
+Set `OLLAMA_MODELS` in `.env` with comma-separated model names (default: `qwen2.5:7b,nomic-embed-text`)
 
 ```bash
-# Test Ollama (already includes qwen2.5:7b model)
-docker compose exec backend python -c "
-import asyncio
-from app.helpers.llm.ollama_client import ollama_client
-
-async def test():
-    response = await ollama_client.generate('Say hello from the template!')
-    print(response['content'])
-
-asyncio.run(test())
-"
+# .env
+OLLAMA_MODELS=qwen2.5:7b,nomic-embed-text
+# Or use different models: llama3.3:70b,codellama,mistral
 ```
 
-**Model:** `qwen2.5:7b` (7 billion parameters, ~11GB)
-**Performance:** Fast inference on modern CPUs/GPUs
-**Use cases:** Development, testing, privacy-sensitive applications
+**Default Models:**
+- **Chat:** `qwen2.5:7b` (7B parameters, ~4.7GB) - Fast inference, general-purpose
+- **Embeddings:** `nomic-embed-text` (~274MB) - 768-dim vectors for RAG, search
+
+**Test Models:**
+```bash
+# Test chat model
+docker compose exec ollama ollama run qwen2.5:7b "Hello!"
+
+# Test embedding model
+docker compose exec ollama ollama run nomic-embed-text "Generate embeddings"
+
+# List available models
+docker compose exec ollama ollama list
+```
+
+**Use cases:** Development, testing, privacy-sensitive applications, offline AI
 
 ### Google Gemini
 
