@@ -61,12 +61,6 @@ class Settings(BaseSettings):
     celery_broker_url: str = Field(default="amqp://guest:guest@rabbitmq:5672//")
     celery_result_backend: str = Field(default="redis://redis:6379/0")
 
-    # JWT
-    jwt_secret_key: str = Field(default="change-this-in-production")
-    jwt_algorithm: str = Field(default="HS256")
-    jwt_access_token_expire_minutes: int = Field(default=30)
-    jwt_refresh_token_expire_days: int = Field(default=7)
-
     # CORS
     cors_origins: str = Field(default="http://localhost:3000,http://localhost:5173,http://localhost:80")
     cors_allow_credentials: bool = Field(default=True)
