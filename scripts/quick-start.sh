@@ -1,0 +1,79 @@
+#!/bin/bash
+set -e
+
+echo "============================================================"
+echo "🚀 Python Full-Stack Project Template - Quick Start"
+echo "============================================================"
+echo ""
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Error: Docker is not running. Please start Docker Desktop."
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Docker is running${NC}"
+echo ""
+
+# Check if services are already running
+if docker compose ps | grep -q "Up"; then
+    echo -e "${YELLOW}⚠️  Services are already running. Stopping them first...${NC}"
+    docker compose down
+    echo ""
+fi
+
+# Start services
+echo -e "${BLUE}📦 Starting Docker services...${NC}"
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+echo ""
+echo -e "${BLUE}⏳ Waiting for services to be healthy...${NC}"
+sleep 10
+
+# Check if backend is up
+echo -e "${BLUE}🔍 Checking backend status...${NC}"
+until docker compose exec backend curl -f http://localhost:8000/health > /dev/null 2>&1; do
+    echo "   Waiting for backend..."
+    sleep 2
+done
+echo -e "${GREEN}✅ Backend is ready${NC}"
+
+# Run migrations
+echo ""
+echo -e "${BLUE}🗄️  Running database migrations...${NC}"
+docker compose exec backend alembic upgrade head
+echo -e "${GREEN}✅ Migrations complete${NC}"
+
+# Seed data
+echo ""
+echo -e "${BLUE}🌱 Seeding initial data...${NC}"
+docker compose exec backend python scripts/seed_data.py
+echo ""
+
+echo "============================================================"
+echo -e "${GREEN}✅ Setup Complete!${NC}"
+echo "============================================================"
+echo ""
+echo "Access the application:"
+echo -e "  🌐 Frontend:     ${BLUE}http://localhost:80${NC}"
+echo -e "  🔧 Backend API:  ${BLUE}http://localhost:8000${NC}"
+echo -e "  📚 API Docs:     ${BLUE}http://localhost:8000/docs${NC}"
+echo -e "  👨‍💼 Admin Panel:  ${BLUE}http://localhost:80/admin${NC}"
+echo ""
+echo "Default credentials:"
+echo "  📧 Email:    admin@example.com"
+echo "  🔑 Password: admin"
+echo ""
+echo "Useful commands:"
+echo "  📊 View logs:        docker compose logs -f"
+echo "  🛑 Stop services:    docker compose down"
+echo "  🔄 Restart:          docker compose restart"
+echo "  🧹 Clean everything: docker compose down -v"
+echo ""
+echo "============================================================"

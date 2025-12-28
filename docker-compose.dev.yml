@@ -1,0 +1,54 @@
+# Development environment overrides
+# This file extends docker-compose.yml with development-specific settings:
+# - Hot reload enabled
+# - Debug mode on
+# - Volume mounts for live code updates
+# - Exposed database ports for local access
+
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+      - BACKEND_RELOAD=true
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  celery-worker:
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+    # Auto-reload on code changes
+    command: watchmedo auto-restart --directory=/app --pattern=*.py --recursive -- python -m celery -A app.helpers.celery_app worker --loglevel=debug
+
+  celery-beat:
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+
+  frontend:
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host
+
+  # Development-only service: PGAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - db-network
+    depends_on:
+      - postgres
+
+volumes:
+  pgadmin_data:

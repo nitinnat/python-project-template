@@ -1,0 +1,68 @@
+# Minimal Docker Compose - Just Backend + Database
+# Perfect for quick testing and development
+#
+# Usage: docker compose -f docker-compose.minimal.yml up
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_minimal
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_minimal:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: redis_minimal
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_minimal
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data_minimal:
+
+networks:
+  default:
+    name: minimal_network

@@ -1,0 +1,43 @@
+# Celery Worker Dockerfile
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    C_FORCE_ROOT=true
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install poetry==1.7.1
+
+# Install watchdog for auto-reload in development
+RUN pip install watchdog[watchmedo]
+
+# Copy dependency files
+COPY pyproject.toml ./
+
+# Install Python dependencies including Celery extras
+# Generate lock file if it doesn't exist, then install with celery extra
+RUN poetry config virtualenvs.create false \
+    && ([ -f poetry.lock ] || poetry lock) \
+    && poetry install --no-interaction --no-ansi --no-root --extras "celery"
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN useradd -m -u 1000 celeryuser && chown -R celeryuser:celeryuser /app
+USER celeryuser
+
+# Default command (can be overridden)
+CMD ["python", "-m", "celery", "-A", "app.helpers.celery_app", "worker", "--loglevel=info"]

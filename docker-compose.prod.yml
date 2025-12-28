@@ -1,0 +1,134 @@
+# Production environment overrides
+# This file extends docker-compose.yml with production-specific settings:
+# - No hot reload
+# - Optimized builds
+# - Security hardening
+# - Resource limits
+# - Health checks
+
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - BACKEND_RELOAD=false
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  celery-worker:
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    command: celery -A app.helpers.celery_app worker --loglevel=warning --concurrency=4
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      replicas: 2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  celery-beat:
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    command: celery -A app.helpers.celery_app beat --loglevel=warning
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    environment:
+      - NODE_ENV=production
+    build:
+      args:
+        - NODE_ENV=production
+    command: npm run preview -- --host --port 5173
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

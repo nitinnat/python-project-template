@@ -1,0 +1,90 @@
+[tool.poetry]
+name = "python-project-template"
+version = "1.0.0"
+description = "A comprehensive Python full-stack project template"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+pydantic = {extras = ["email"], version = "^2.5.0"}
+pydantic-settings = "^2.1.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+asyncpg = "^0.29.0"
+alembic = "^1.13.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+redis = {extras = ["hiredis"], version = "^5.0.1"}
+httpx = "^0.26.0"
+
+# Optional dependencies based on feature flags
+motor = {version = "^3.3.2", optional = true}
+neo4j = {version = "^5.16.0", optional = true}
+celery = {version = "^5.3.4", optional = true}
+kombu = {version = "^5.3.4", optional = true}
+
+# LLM providers
+openai = {version = "^1.10.0", optional = true}
+anthropic = {version = "^0.8.1", optional = true}
+google-generativeai = {version = "^0.3.2", optional = true}
+litellm = {version = "^1.17.0", optional = true}
+langchain = {version = "^0.1.0", optional = true}
+langchain-openai = {version = "^0.0.2", optional = true}
+
+# Observability
+opentelemetry-api = "^1.22.0"
+opentelemetry-sdk = "^1.22.0"
+opentelemetry-instrumentation-fastapi = "^0.43b0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.23.3"
+pytest-cov = "^4.1.0"
+ruff = "^0.1.11"
+black = "^23.12.1"
+mypy = "^1.8.0"
+faker = "^22.0.0"
+httpx = "^0.26.0"
+
+[tool.poetry.extras]
+mongodb = ["motor"]
+neo4j = ["neo4j"]
+celery = ["celery", "kombu"]
+openai = ["openai"]
+anthropic = ["anthropic"]
+google = ["google-generativeai"]
+litellm = ["litellm"]
+langchain = ["langchain", "langchain-openai"]
+all = ["motor", "neo4j", "celery", "kombu", "openai", "anthropic", "google-generativeai", "litellm", "langchain", "langchain-openai"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--cov=app --cov-report=term-missing --cov-report=html"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

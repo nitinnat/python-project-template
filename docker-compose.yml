@@ -1,0 +1,273 @@
+# Base Docker Compose configuration
+# This file defines all services. Use profiles to conditionally start services
+# based on features.env configuration.
+
+version: '3.8'
+
+services:
+  # Backend API (always enabled)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+      - features.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - MONGODB_HOST=mongodb
+      - NEO4J_HOST=neo4j
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://ollama:11434}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend-network
+      - db-network
+    volumes:
+      - ./backend:/app
+
+  # PostgreSQL Database (always enabled)
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-app_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (always enabled)
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB (optional - profile: mongodb)
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    profiles:
+      - mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:-mongo}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD:-mongo}
+      - MONGO_INITDB_DATABASE=${MONGODB_DB:-app_db}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - db-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Neo4j Graph Database (optional - profile: neo4j)
+  neo4j:
+    image: neo4j:5.15
+    container_name: neo4j
+    restart: unless-stopped
+    profiles:
+      - neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-password}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p password 'RETURN 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ Message Broker (optional - profile: rabbitmq)
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    profiles:
+      - rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Ollama (optional - profile: ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    profiles:
+      - ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Celery Worker (optional - profile: celery)
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.celery
+    container_name: celery-worker
+    restart: unless-stopped
+    profiles:
+      - celery
+    env_file:
+      - .env
+      - features.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - MONGODB_HOST=mongodb
+      - NEO4J_HOST=neo4j
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+    networks:
+      - backend-network
+      - db-network
+    volumes:
+      - ./backend:/app
+    command: python -m celery -A app.helpers.celery_app worker --loglevel=info
+
+  # Celery Beat Scheduler (optional - profile: celery)
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.celery
+    container_name: celery-beat
+    restart: unless-stopped
+    profiles:
+      - celery
+    env_file:
+      - .env
+      - features.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - backend-network
+    volumes:
+      - ./backend:/app
+    command: python -m celery -A app.helpers.celery_app beat --loglevel=info
+
+  # Frontend (optional - profile: frontend)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    profiles:
+      - frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    networks:
+      - frontend-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # Nginx Reverse Proxy (optional - profile: nginx)
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: unless-stopped
+    profiles:
+      - nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - frontend-network
+      - backend-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+networks:
+  frontend-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
+  db-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  neo4j_data:
+  redis_data:
+  rabbitmq_data:
+  ollama_data:
