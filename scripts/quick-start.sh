@@ -76,7 +76,8 @@ fi
 
 # Start services
 echo -e "${BLUE}📦 Starting Docker services...${NC}"
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+PROFILES=$(./scripts/generate-profiles.sh)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml $PROFILES up -d
 
 echo ""
 echo -e "${BLUE}⏳ Waiting for services to be healthy...${NC}"
