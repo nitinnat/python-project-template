@@ -4,6 +4,8 @@ API v1 router aggregator.
 Combines all v1 endpoints.
 """
 
+import importlib
+
 from fastapi import APIRouter
 
 from app.api.v1 import admin, health
@@ -19,12 +21,12 @@ api_router.include_router(admin.router)
 
 # Include document routes (only if MongoDB is enabled)
 if settings.enable_mongodb:
-    from app.api.v1 import documents
+    documents = importlib.import_module("app.api.v1.documents")
     api_router.include_router(documents.router)
 
 # Include graph routes (only if Neo4j is enabled)
 if settings.enable_neo4j:
-    from app.api.v1 import graph
+    graph = importlib.import_module("app.api.v1.graph")
     api_router.include_router(graph.router)
 
 # Additional routers can be added:
