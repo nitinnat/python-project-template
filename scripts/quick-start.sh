@@ -433,10 +433,15 @@ if docker compose ps | grep -q "Up"; then
     echo ""
 fi
 
+# Build containers with correct dependencies based on .env
+echo ""
+echo -e "${BLUE}🔨 Building containers with selected dependencies...${NC}"
+PROFILES=$(./scripts/generate-profiles.sh)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml $PROFILES build
+
 # Start services
 echo ""
 echo -e "${BLUE}🐳 Starting Docker containers...${NC}"
-PROFILES=$(./scripts/generate-profiles.sh)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml $PROFILES up -d
 
 echo ""
