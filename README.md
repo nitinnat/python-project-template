@@ -327,7 +327,7 @@ graph LR
 git clone https://github.com/nitinnat/python-project-template.git
 cd python-project-template
 
-# Option 1: Default setup (Full-Stack: Frontend, Backend, Nginx, Postgres+PGVector)
+# Option 1: Default setup (Full-Stack: Frontend, Backend, Nginx, Postgres+PGVector, Ollama)
 ./scripts/quick-start.sh
 
 # Option 2: With specific profile
@@ -343,7 +343,7 @@ The script automatically:
 - Seeds initial data
 
 **Available profiles** (see [profiles/](profiles/) for details):
-- `fullstack` (default) - Web app with React frontend, Backend API, Nginx, Postgres+PGVector
+- `fullstack` (default) - Web app with React frontend, Backend API, Nginx, Postgres+PGVector, Ollama (phi3 + nomic-embed-text)
 - `minimal` - Simple API only (Backend + PostgreSQL + Redis)
 - `ai-local` - Ollama with chat + embeddings models
 - `ai-cloud` - OpenAI + Anthropic + Google APIs
