@@ -1,6 +1,6 @@
 # Base Docker Compose configuration
 # This file defines all services. Use profiles to conditionally start services
-# based on features.env configuration.
+# based on .env configuration.
 
 version: '3.8'
 
@@ -25,7 +25,6 @@ services:
       - "8000:8000"
     env_file:
       - .env
-      - features.env
     environment:
       - POSTGRES_HOST=postgres
       - MONGODB_HOST=mongodb
@@ -224,7 +223,6 @@ services:
       - celery
     env_file:
       - .env
-      - features.env
     environment:
       - POSTGRES_HOST=postgres
       - MONGODB_HOST=mongodb
@@ -261,7 +259,6 @@ services:
       - celery
     env_file:
       - .env
-      - features.env
     environment:
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
