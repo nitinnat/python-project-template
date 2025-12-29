@@ -63,7 +63,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis Cache (always enabled)
+  # Redis Cache (always enabled, optional via ENABLE_REDIS feature flag)
   redis:
     image: redis:7-alpine
     container_name: redis

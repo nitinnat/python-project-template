@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y \
 # Install Poetry
 RUN pip install poetry==1.7.1
 
-# Copy dependency files
-COPY pyproject.toml ./
+# Copy dependency files (poetry.lock must exist for fast builds)
+COPY pyproject.toml poetry.lock ./
 
 # Accept build arguments for individual extras
 ARG ENABLE_MONGODB=false
@@ -34,10 +34,9 @@ ARG ENABLE_LLM_LITELLM=false
 ARG ENABLE_LLM_LANGCHAIN=false
 
 # Install Python dependencies with selected extras based on enabled features
-# Generate lock file if it doesn't exist, then install
-RUN poetry config virtualenvs.create false \
-    && ([ -f poetry.lock ] || poetry lock) \
-    && EXTRAS=""; \
+RUN poetry config virtualenvs.create false
+
+RUN EXTRAS=""; \
     [ "$ENABLE_MONGODB" = "true" ] && EXTRAS="$EXTRAS mongodb"; \
     [ "$ENABLE_NEO4J" = "true" ] && EXTRAS="$EXTRAS neo4j"; \
     [ "$ENABLE_CELERY_WORKER" = "true" ] && EXTRAS="$EXTRAS celery"; \

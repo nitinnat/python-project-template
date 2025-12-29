@@ -10,7 +10,11 @@ echo ""
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
+
+# Parse arguments
+PROFILE="${1:-default}"
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
@@ -20,6 +24,48 @@ fi
 
 echo -e "${GREEN}✅ Docker is running${NC}"
 echo ""
+
+# Setup environment files
+echo -e "${BLUE}📋 Setting up environment...${NC}"
+
+# Copy .env.example to .env if it doesn't exist
+if [ ! -f .env ]; then
+    cp .env.example .env
+    echo -e "${GREEN}✅ Created .env from .env.example${NC}"
+else
+    echo -e "${YELLOW}ℹ️  .env already exists, skipping${NC}"
+fi
+
+# Setup features.env based on profile
+if [ "$PROFILE" != "default" ]; then
+    PROFILE_FILE="profiles/${PROFILE}.env"
+    if [ ! -f "$PROFILE_FILE" ]; then
+        echo -e "${RED}❌ Error: Profile '${PROFILE}' not found at ${PROFILE_FILE}${NC}"
+        echo ""
+        echo "Available profiles:"
+        ls -1 profiles/*.env | sed 's|profiles/||' | sed 's|.env||' | sed 's/^/  - /'
+        exit 1
+    fi
+    cp "$PROFILE_FILE" features.env
+    echo -e "${GREEN}✅ Using profile: ${PROFILE}${NC}"
+else
+    # Use default features.env if it exists, otherwise create from minimal profile
+    if [ ! -f features.env ]; then
+        cp profiles/minimal.env features.env
+        echo -e "${GREEN}✅ Created features.env from minimal profile (default)${NC}"
+    else
+        echo -e "${YELLOW}ℹ️  features.env already exists, skipping${NC}"
+    fi
+fi
+echo ""
+
+# Regenerate poetry.lock if pyproject.toml was modified
+if [ backend/pyproject.toml -nt backend/poetry.lock ]; then
+    echo -e "${BLUE}📝 pyproject.toml updated, regenerating poetry.lock...${NC}"
+    cd backend && poetry lock && cd ..
+    echo -e "${GREEN}✅ poetry.lock updated${NC}"
+    echo ""
+fi
 
 # Check if services are already running
 if docker compose ps | grep -q "Up"; then
