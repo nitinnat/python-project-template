@@ -321,35 +321,39 @@ graph LR
 - **Git** ([Download](https://git-scm.com/downloads))
 - *Optional:* Make utility for convenience commands
 
-### Quick Start (Recommended)
+### Interactive Setup (Recommended)
 
 ```bash
-git clone https://github.com/nitinnat/python-project-template.git
-cd python-project-template
+git clone https://github.com/nitinnat/python-project-template.git my-awesome-app
+cd my-awesome-app
 
-# Option 1: Default setup (Full-Stack: Frontend, Backend, Nginx, Postgres+PGVector, Ollama)
+# Interactive mode - prompts for configuration
 ./scripts/quick-start.sh
 
-# Option 2: With specific profile
-./scripts/quick-start.sh ai-local    # or: minimal, ai-cloud, data-platform, async-tasks, everything
+# OR use a preset for non-interactive setup
+./scripts/quick-start.sh --preset fullstack
 ```
 
-The script automatically:
-- Sets up `.env` from `.env.example`
-- Configures `features.env` from selected profile (fullstack by default)
-- Regenerates `poetry.lock` if `pyproject.toml` changed
-- Starts all Docker services
+The interactive setup will ask you:
+- Which services to enable (Frontend, Nginx, databases)
+- Which LLM provider to use (Ollama, OpenAI, Anthropic, Google)
+- Which Ollama models to auto-pull
+- Advanced features (Celery background tasks)
+
+Then it automatically:
+- Generates `.env` with your configuration
+- Regenerates `poetry.lock` if needed
+- Starts selected Docker services
 - Runs database migrations
 - Seeds initial data
 
-**Available profiles** (see [profiles/](profiles/) for details):
-- `fullstack` (default) - Web app with React frontend, Backend API, Nginx, Postgres+PGVector, Ollama (phi3 + nomic-embed-text)
-- `minimal` - Simple API only (Backend + PostgreSQL + Redis)
-- `ai-local` - Ollama with chat + embeddings models
+**Available presets**:
+- `fullstack` (default) - Frontend + Backend + Nginx + Postgres + Ollama (phi3 + nomic-embed-text)
+- `minimal` - Backend + PostgreSQL + Redis only
+- `ai-local` - Ollama with qwen2.5:7b + nomic-embed-text
 - `ai-cloud` - OpenAI + Anthropic + Google APIs
 - `data-platform` - PostgreSQL + MongoDB + Neo4j
-- `async-tasks` - Celery background jobs
-- `everything` - All features (15GB)
+- `async-tasks` - Celery + RabbitMQ for background jobs
 
 ### Access Your Application
 
@@ -471,15 +475,14 @@ python-project-template/
 │   └── Dockerfile              # Nginx container
 │
 ├── scripts/                     # Utility scripts
-│   ├── quick-start.sh          # One-command startup
+│   ├── quick-start.sh          # Interactive setup with prompts
 │   ├── generate-profiles.sh    # Docker Compose profile generator
 │   └── init-project.sh         # Project initialization
 │
 ├── docker-compose.yml           # Base compose configuration
 ├── docker-compose.dev.yml       # Development overrides
 ├── docker-compose.prod.yml      # Production overrides
-├── docker-compose.minimal.yml   # Minimal setup (backend only)
-├── features.env                 # Build-time feature flags
+├── .env                         # Environment variables and feature flags
 ├── .env.example                 # Environment template
 ├── Makefile                     # Development commands
 ├── README.md                    # This file
@@ -596,7 +599,7 @@ graph LR
     A[Feature Flags] --> B[Build-Time Flags]
     A --> C[Runtime Flags]
 
-    B --> D[features.env]
+    B --> D[.env]
     B --> E[Docker Compose Profiles]
 
     C --> F[Database Storage]
@@ -613,7 +616,7 @@ graph LR
     style C fill:#95e1d3,stroke:#333,color:#000
 ```
 
-### Build-Time Flags (`features.env`)
+### Build-Time Flags (`.env`)
 
 Control which **Docker containers** start:
 
@@ -628,8 +631,8 @@ ENABLE_FRONTEND=true
 ENABLE_NGINX=true
 
 # Optional Databases
-ENABLE_MONGODB=true
-ENABLE_NEO4J=true
+ENABLE_MONGODB=false
+ENABLE_NEO4J=false
 ENABLE_PGVECTOR=true
 
 # Background Processing
@@ -639,18 +642,18 @@ ENABLE_CELERY_BEAT=false
 
 # LLM Providers
 ENABLE_LLM_OLLAMA=true
-ENABLE_LLM_OPENAI=true
-ENABLE_LLM_ANTHROPIC=true
+ENABLE_LLM_OPENAI=false
+ENABLE_LLM_ANTHROPIC=false
 ENABLE_LLM_GOOGLE=false
 ```
 
 **Apply changes:**
 ```bash
-# Edit features.env, then restart
+# Edit .env, then restart
 make dev
 ```
 
-**Optimized Dependencies:** Feature flags automatically control which Python dependencies are installed during build. Disabling MongoDB/Neo4j/LLM providers in `features.env` skips their corresponding packages, reducing build time by 50%+ and container size significantly.
+**Optimized Dependencies:** Feature flags automatically control which Python dependencies are installed during build. Disabling MongoDB/Neo4j/LLM providers in `.env` skips their corresponding packages, reducing build time by 50%+ and container size significantly.
 
 ### Runtime Flags (Admin UI)
 
@@ -1122,19 +1125,17 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 ### Feature Flags
 
-Edit `features.env` to control which services start:
+Edit `.env` to control which services start, or use the interactive quick-start script:
 
 ```bash
-# Enable all features (microservices setup)
-cp features.env.microservices features.env
-make dev
+# Interactive setup with prompts
+./scripts/quick-start.sh
 
-# Minimal setup (API only)
-cp features.env.minimal features.env
-make dev
+# Or use a preset
+./scripts/quick-start.sh --preset fullstack  # or minimal, ai-local, etc.
 
-# Custom configuration
-vi features.env  # Edit to your needs
+# Or manually edit .env
+vi .env  # Edit ENABLE_* flags
 make dev
 ```
 
