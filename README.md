@@ -25,11 +25,11 @@
 
 ## 📋 Table of Contents
 
+- [Quick Start](#-quick-start)
 - [Overview](#-overview)
 - [Features](#-features)
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
 - [Project Structure](#-project-structure)
 - [Service Health Monitoring](#-service-health-monitoring)
 - [Feature Flag System](#-feature-flag-system)
@@ -42,6 +42,44 @@
 - [Deployment](#-deployment)
 - [Customization](#-customization)
 - [Contributing](#-contributing)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Docker Desktop** 24+ ([Download](https://www.docker.com/products/docker-desktop))
+- **Docker Compose** 2.0+ (included with Docker Desktop)
+- **Git** ([Download](https://git-scm.com/downloads))
+
+### Get Started in 3 Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/nitinnat/python-project-template.git my-awesome-app
+cd my-awesome-app
+
+# 2. Run interactive setup
+./scripts/quick-start.sh
+
+# 3. Access your application
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:8000
+# API Docs: http://localhost:8000/docs
+```
+
+The interactive setup will guide you through:
+- **Service selection** - Frontend, Nginx, databases
+- **LLM provider** - Ollama (local), OpenAI, Anthropic, Google
+- **Configuration review** - Add API keys before containers start
+
+**Non-interactive setup with presets:**
+```bash
+./scripts/quick-start.sh --preset fullstack  # Full-stack app (default)
+./scripts/quick-start.sh --preset minimal    # API only
+./scripts/quick-start.sh --preset ai-local   # With Ollama
+```
 
 ---
 
@@ -309,91 +347,6 @@ graph LR
 </td>
 </tr>
 </table>
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Docker Desktop** 24+ ([Download](https://www.docker.com/products/docker-desktop))
-- **Docker Compose** 2.0+ (included with Docker Desktop)
-- **Git** ([Download](https://git-scm.com/downloads))
-- *Optional:* Make utility for convenience commands
-
-### Interactive Setup (Recommended)
-
-```bash
-git clone https://github.com/nitinnat/python-project-template.git my-awesome-app
-cd my-awesome-app
-
-# Interactive mode - prompts for configuration
-./scripts/quick-start.sh
-
-# OR use a preset for non-interactive setup
-./scripts/quick-start.sh --preset fullstack
-```
-
-The interactive setup will ask you:
-- Which services to enable (Frontend, Nginx, databases)
-- Which LLM provider to use (Ollama, OpenAI, Anthropic, Google)
-- Which Ollama models to auto-pull
-- Advanced features (Celery background tasks)
-
-Then it automatically:
-- Generates `.env` with your configuration
-- Regenerates `poetry.lock` if needed
-- Starts selected Docker services
-- Runs database migrations
-- Seeds initial data
-
-**Available presets**:
-- `fullstack` (default) - Frontend + Backend + Nginx + Postgres + Ollama (phi3 + nomic-embed-text)
-- `minimal` - Backend + PostgreSQL + Redis only
-- `ai-local` - Ollama with qwen2.5:7b + nomic-embed-text
-- `ai-cloud` - OpenAI + Anthropic + Google APIs
-- `data-platform` - PostgreSQL + MongoDB + Neo4j
-- `async-tasks` - Celery + RabbitMQ for background jobs
-
-### Access Your Application
-
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| **Frontend** | http://localhost:5173 | N/A (auth disabled) |
-| **Backend API** | http://localhost:8000 | N/A |
-| **API Documentation** | http://localhost:8000/docs | Interactive Swagger UI |
-| **Admin Dashboard** | http://localhost:5173/admin | Feature flags, health monitoring |
-| **RabbitMQ UI** | http://localhost:15672 | guest / guest |
-| **Neo4j Browser** | http://localhost:7474 | neo4j / password |
-| **Ollama API** | http://localhost:11434 | Local LLM endpoint |
-
-### 5️⃣ Verify Installation
-
-```bash
-# Check all services are healthy
-curl http://localhost:8000/api/v1/health/services | jq
-
-# Expected output:
-# {
-#   "status": "healthy",
-#   "services": {
-#     "postgres": { "status": "healthy", "latency_ms": 8.56 },
-#     "redis": { "status": "healthy", "latency_ms": 1.05 },
-#     "mongodb": { "status": "healthy", "latency_ms": 2.36 },
-#     "neo4j": { "status": "healthy", "latency_ms": 9.10 },
-#     "ollama": { "status": "healthy", "latency_ms": 22.09 }
-#   }
-# }
-```
-
-### 🎉 You're Ready!
-
-The template is running with:
-- ✅ Backend API at http://localhost:8000
-- ✅ Frontend UI at http://localhost:5173
-- ✅ All databases connected
-- ✅ Local LLMs available (Ollama: qwen2.5:7b chat + nomic-embed-text embeddings)
-- ✅ Hot reload enabled for development
 
 ---
 
