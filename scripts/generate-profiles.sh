@@ -1,9 +1,9 @@
 #!/bin/bash
 # scripts/generate-profiles.sh
-# Reads features.env and generates docker compose command with appropriate profiles
+# Reads .env and generates docker compose command with appropriate profiles
 
 set -a
-source features.env
+source .env
 set +a
 
 PROFILES=""
