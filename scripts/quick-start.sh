@@ -119,10 +119,11 @@ ask_choice() {
     local options=("$@")
     local choice
 
-    echo "$prompt"
+    echo -e "$prompt"
     for i in "${!options[@]}"; do
-        echo "  $((i+1))) ${options[$i]}"
+        echo -e "  $((i+1))) ${options[$i]}"
     done
+    echo ""
 
     while true; do
         read -p "Choice [1]: " choice
