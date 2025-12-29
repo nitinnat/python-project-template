@@ -203,28 +203,8 @@ apply_preset() {
     esac
 }
 
-rename_project() {
-    local new_name="$1"
-
-    echo -e "${BLUE}🏷️  Renaming project to: ${new_name}${NC}"
-
-    # Update docker-compose.yml container names
-    if [ -f docker-compose.yml ]; then
-        sed -i.bak "s/container_name: backend/container_name: ${new_name}-backend/" docker-compose.yml
-        sed -i.bak "s/container_name: frontend/container_name: ${new_name}-frontend/" docker-compose.yml
-        sed -i.bak "s/container_name: nginx/container_name: ${new_name}-nginx/" docker-compose.yml
-        sed -i.bak "s/container_name: postgres/container_name: ${new_name}-postgres/" docker-compose.yml
-        sed -i.bak "s/container_name: redis/container_name: ${new_name}-redis/" docker-compose.yml
-        sed -i.bak "s/container_name: ollama/container_name: ${new_name}-ollama/" docker-compose.yml
-        sed -i.bak "s/container_name: mongodb/container_name: ${new_name}-mongodb/" docker-compose.yml
-        sed -i.bak "s/container_name: neo4j/container_name: ${new_name}-neo4j/" docker-compose.yml
-        sed -i.bak "s/container_name: rabbitmq/container_name: ${new_name}-rabbitmq/" docker-compose.yml
-        sed -i.bak "s/container_name: celery-worker/container_name: ${new_name}-celery-worker/" docker-compose.yml
-        sed -i.bak "s/container_name: celery-beat/container_name: ${new_name}-celery-beat/" docker-compose.yml
-        sed -i.bak "s/python-project-template/${new_name}/g" docker-compose.yml
-        rm -f docker-compose.yml.bak
-    fi
-}
+# Project name is determined by parent folder name
+# No need to rename anything - Docker Compose will use directory name as project name
 
 generate_env_file() {
     echo -e "${BLUE}📄 Generating .env file...${NC}"
@@ -345,15 +325,6 @@ fi
 
 # Interactive setup
 if [ "$INTERACTIVE" = true ]; then
-    echo -e "${BLUE}📝 Project Setup${NC}"
-
-    # Get project name
-    if [ -z "$PROJECT_NAME" ]; then
-        DEFAULT_NAME=$(basename "$(pwd)")
-        PROJECT_NAME=$(ask_input "Project name" "$DEFAULT_NAME")
-    fi
-    echo ""
-
     # Service selection
     echo -e "${BLUE}🎯 Service Selection${NC}"
     if ask_yes_no "Do you want a frontend" "y"; then
@@ -414,15 +385,8 @@ if [ "$INTERACTIVE" = true ]; then
     echo ""
 fi
 
-# Ensure PROJECT_NAME is set
-if [ -z "$PROJECT_NAME" ]; then
-    PROJECT_NAME=$(basename "$(pwd)")
-fi
-
-# Rename project if needed
-if [ "$PROJECT_NAME" != "python-project-template" ]; then
-    rename_project "$PROJECT_NAME"
-fi
+# Set PROJECT_NAME from directory name
+PROJECT_NAME=$(basename "$(pwd)")
 
 # Generate .env file
 generate_env_file
@@ -453,7 +417,7 @@ sleep 10
 
 # Check if backend is up
 echo -e "${BLUE}🔍 Checking backend status...${NC}"
-until docker compose exec ${PROJECT_NAME}-backend curl -f http://localhost:8000/health > /dev/null 2>&1; do
+until docker compose exec backend curl -f http://localhost:8000/health > /dev/null 2>&1; do
     echo "   Waiting for backend..."
     sleep 2
 done
@@ -462,13 +426,13 @@ echo -e "${GREEN}✅ Backend is ready${NC}"
 # Run migrations
 echo ""
 echo -e "${BLUE}🗄️  Running database migrations...${NC}"
-docker compose exec ${PROJECT_NAME}-backend alembic upgrade head
+docker compose exec backend alembic upgrade head
 echo -e "${GREEN}✅ Migrations complete${NC}"
 
 # Seed data
 echo ""
 echo -e "${BLUE}🌱 Seeding initial data...${NC}"
-docker compose exec ${PROJECT_NAME}-backend python scripts/seed_data.py
+docker compose exec backend python scripts/seed_data.py
 echo ""
 
 echo "============================================================"
