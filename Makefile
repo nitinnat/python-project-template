@@ -5,9 +5,9 @@
 help:
 	@echo "Python Project Template - Available Commands:"
 	@echo ""
-	@echo "  make quickstart [PROFILE] - Quick start (recommended) - use profile arg: ai-local, fullstack, etc."
-	@echo "  make dev          - Start development environment (requires features.env)"
-	@echo "  make prod         - Start production environment (requires features.env)"
+	@echo "  make quickstart [PROFILE] - Interactive quick start (or use preset: fullstack, minimal, ai-local)"
+	@echo "  make dev          - Start development environment (requires .env)"
+	@echo "  make prod         - Start production environment (requires .env)"
 	@echo "  make down         - Stop all services"
 	@echo "  make clean        - Stop services and remove volumes"
 	@echo "  make logs         - View logs (add SERVICE=backend to filter)"
@@ -20,14 +20,18 @@ help:
 	@echo "  make db-shell     - Open PostgreSQL shell"
 	@echo ""
 
-# Quick start with optional profile
+# Quick start with optional preset
 quickstart:
 	@chmod +x scripts/quick-start.sh
-	@./scripts/quick-start.sh $(PROFILE)
+	@if [ -n "$(PROFILE)" ]; then \
+		./scripts/quick-start.sh --preset $(PROFILE) --no-interactive; \
+	else \
+		./scripts/quick-start.sh; \
+	fi
 
-# Generate Docker Compose profiles based on features.env
+# Generate Docker Compose profiles based on .env
 configure:
-	@echo "Generating Docker Compose profiles from features.env..."
+	@echo "Generating Docker Compose profiles from .env..."
 	@chmod +x scripts/generate-profiles.sh
 	@echo "Configuration ready!"
 
