@@ -391,6 +391,32 @@ PROJECT_NAME=$(basename "$(pwd)")
 # Generate .env file
 generate_env_file
 
+# Prompt user to review and edit .env if needed
+echo ""
+echo -e "${YELLOW}📝 IMPORTANT: Review your .env file before continuing${NC}"
+echo ""
+echo "The .env file has been generated at: $(pwd)/.env"
+echo ""
+echo "You may need to update:"
+echo "  - API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY)"
+echo "  - Database passwords (for production)"
+echo "  - SECRET_KEY (change in production)"
+echo ""
+
+if [ "$INTERACTIVE" = true ]; then
+    if ! ask_yes_no "Continue with Docker setup" "y"; then
+        echo ""
+        echo -e "${GREEN}✅ Configuration saved to .env${NC}"
+        echo ""
+        echo -e "${YELLOW}Setup paused. Next steps:${NC}"
+        echo "  1. Edit .env file and add your API keys"
+        echo "  2. When ready, run: ./scripts/quick-start.sh --no-interactive"
+        echo "     Or run: make dev"
+        echo ""
+        exit 0
+    fi
+fi
+
 # Regenerate poetry.lock if pyproject.toml was modified
 if [ backend/pyproject.toml -nt backend/poetry.lock ]; then
     echo -e "${BLUE}📝 pyproject.toml updated, regenerating poetry.lock...${NC}"
@@ -407,6 +433,7 @@ if docker compose ps | grep -q "Up"; then
 fi
 
 # Start services
+echo ""
 echo -e "${BLUE}🐳 Starting Docker containers...${NC}"
 PROFILES=$(./scripts/generate-profiles.sh)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml $PROFILES up -d
