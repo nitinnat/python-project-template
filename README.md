@@ -327,24 +327,24 @@ graph LR
 git clone https://github.com/nitinnat/python-project-template.git
 cd python-project-template
 
-# Option 1: Default setup (minimal profile)
+# Option 1: Default setup (Full-Stack: Frontend, Backend, Nginx, Postgres+PGVector)
 ./scripts/quick-start.sh
 
 # Option 2: With specific profile
-./scripts/quick-start.sh ai-local    # or: minimal, fullstack, ai-cloud, data-platform, async-tasks, everything
+./scripts/quick-start.sh ai-local    # or: minimal, ai-cloud, data-platform, async-tasks, everything
 ```
 
 The script automatically:
 - Sets up `.env` from `.env.example`
-- Configures `features.env` from selected profile
+- Configures `features.env` from selected profile (fullstack by default)
 - Regenerates `poetry.lock` if `pyproject.toml` changed
 - Starts all Docker services
 - Runs database migrations
 - Seeds initial data
 
 **Available profiles** (see [profiles/](profiles/) for details):
-- `minimal` - Simple API (Backend + PostgreSQL + Redis)
-- `fullstack` - Web app with React frontend
+- `fullstack` (default) - Web app with React frontend, Backend API, Nginx, Postgres+PGVector
+- `minimal` - Simple API only (Backend + PostgreSQL + Redis)
 - `ai-local` - Ollama with chat + embeddings models
 - `ai-cloud` - OpenAI + Anthropic + Google APIs
 - `data-platform` - PostgreSQL + MongoDB + Neo4j

@@ -49,10 +49,10 @@ if [ "$PROFILE" != "default" ]; then
     cp "$PROFILE_FILE" features.env
     echo -e "${GREEN}✅ Using profile: ${PROFILE}${NC}"
 else
-    # Use default features.env if it exists, otherwise create from minimal profile
+    # Use default features.env if it exists, otherwise create from fullstack profile (Frontend + Backend + Nginx + Postgres + PGVector)
     if [ ! -f features.env ]; then
-        cp profiles/minimal.env features.env
-        echo -e "${GREEN}✅ Created features.env from minimal profile (default)${NC}"
+        cp profiles/fullstack.env features.env
+        echo -e "${GREEN}✅ Created features.env from fullstack profile (default: Frontend, Backend, Nginx, Postgres+PGVector)${NC}"
     else
         echo -e "${YELLOW}ℹ️  features.env already exists, skipping${NC}"
     fi
