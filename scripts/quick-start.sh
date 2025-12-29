@@ -451,8 +451,12 @@ until docker compose exec backend curl -f http://localhost:8000/health > /dev/nu
 done
 echo -e "${GREEN}✅ Backend is ready${NC}"
 
-# Run migrations
+# Create database if it doesn't exist
 echo ""
+echo -e "${BLUE}🗄️  Initializing database...${NC}"
+docker compose exec postgres psql -U postgres -c "CREATE DATABASE app_db;" 2>/dev/null || echo "Database app_db already exists"
+
+# Run migrations
 echo -e "${BLUE}🗄️  Running database migrations...${NC}"
 docker compose exec backend alembic upgrade head
 echo -e "${GREEN}✅ Migrations complete${NC}"
