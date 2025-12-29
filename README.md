@@ -321,62 +321,37 @@ graph LR
 - **Git** ([Download](https://git-scm.com/downloads))
 - *Optional:* Make utility for convenience commands
 
-### 1️⃣ Clone the Repository
+### Quick Start (Recommended)
 
 ```bash
 git clone https://github.com/nitinnat/python-project-template.git
 cd python-project-template
+
+# Option 1: Default setup (minimal profile)
+./scripts/quick-start.sh
+
+# Option 2: With specific profile
+./scripts/quick-start.sh ai-local    # or: minimal, fullstack, ai-cloud, data-platform, async-tasks, everything
 ```
 
-### 2️⃣ Configure Environment
+The script automatically:
+- Sets up `.env` from `.env.example`
+- Configures `features.env` from selected profile
+- Regenerates `poetry.lock` if `pyproject.toml` changed
+- Starts all Docker services
+- Runs database migrations
+- Seeds initial data
 
-```bash
-# Copy environment template
-cp .env.example .env
+**Available profiles** (see [profiles/](profiles/) for details):
+- `minimal` - Simple API (Backend + PostgreSQL + Redis)
+- `fullstack` - Web app with React frontend
+- `ai-local` - Ollama with chat + embeddings models
+- `ai-cloud` - OpenAI + Anthropic + Google APIs
+- `data-platform` - PostgreSQL + MongoDB + Neo4j
+- `async-tasks` - Celery background jobs
+- `everything` - All features (15GB)
 
-# Edit with your API keys (optional)
-# - OPENAI_API_KEY for GPT models
-# - ANTHROPIC_API_KEY for Claude
-# - GOOGLE_API_KEY or GEMINI_API_KEY for Gemini
-# Ollama works out-of-the-box without API keys!
-```
-
-### 3️⃣ Choose Your Setup Profile
-
-Pick a pre-configured profile based on your needs (see [profiles/](profiles/) for details):
-
-```bash
-# 🚀 Minimal - Simple API (Backend + PostgreSQL + Redis)
-cp profiles/minimal.env features.env
-
-# 🌐 Full-Stack - Web app with React frontend
-cp profiles/fullstack.env features.env
-
-# 🤖 AI Local - Ollama with chat + embeddings models
-cp profiles/ai-local.env features.env
-
-# ☁️ AI Cloud - OpenAI + Anthropic + Google APIs
-cp profiles/ai-cloud.env features.env
-
-# 📊 Data Platform - PostgreSQL + MongoDB + Neo4j
-cp profiles/data-platform.env features.env
-
-# ⚡ Async Tasks - Celery background jobs
-cp profiles/async-tasks.env features.env
-
-# 🎯 Everything - All features (15GB)
-cp profiles/everything.env features.env
-
-# Then start
-make dev
-```
-
-**Or use default setup:**
-```bash
-make dev  # Uses existing features.env
-```
-
-### 4️⃣ Access Your Application
+### Access Your Application
 
 | Service | URL | Credentials |
 |---------|-----|-------------|

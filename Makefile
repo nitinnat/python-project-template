@@ -1,13 +1,13 @@
 # Makefile for Python Project Template
-.PHONY: help configure dev prod down clean logs test lint format migrate migrate-create shell db-shell
+.PHONY: help quickstart configure dev prod down clean logs test lint format migrate migrate-create shell db-shell
 
 # Default target
 help:
 	@echo "Python Project Template - Available Commands:"
 	@echo ""
-	@echo "  make configure    - Generate Docker Compose profiles from features.env"
-	@echo "  make dev          - Start development environment"
-	@echo "  make prod         - Start production environment"
+	@echo "  make quickstart [PROFILE] - Quick start (recommended) - use profile arg: ai-local, fullstack, etc."
+	@echo "  make dev          - Start development environment (requires features.env)"
+	@echo "  make prod         - Start production environment (requires features.env)"
 	@echo "  make down         - Stop all services"
 	@echo "  make clean        - Stop services and remove volumes"
 	@echo "  make logs         - View logs (add SERVICE=backend to filter)"
@@ -19,6 +19,11 @@ help:
 	@echo "  make shell        - Open backend shell"
 	@echo "  make db-shell     - Open PostgreSQL shell"
 	@echo ""
+
+# Quick start with optional profile
+quickstart:
+	@chmod +x scripts/quick-start.sh
+	@./scripts/quick-start.sh $(PROFILE)
 
 # Generate Docker Compose profiles based on features.env
 configure:
