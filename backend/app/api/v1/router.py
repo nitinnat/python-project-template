@@ -29,6 +29,11 @@ if settings.enable_neo4j:
     graph = importlib.import_module("app.api.v1.graph")
     api_router.include_router(graph.router)
 
+# Include RAG routes (only if Ollama is enabled for embeddings)
+if settings.enable_llm_ollama:
+    rag = importlib.import_module("app.api.v1.rag")
+    api_router.include_router(rag.router)
+
 # Additional routers can be added:
 # - search_router (advanced vector search)
 # - tasks_router (Celery task triggers)

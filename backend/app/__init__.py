@@ -1,3 +1,3 @@
-"""Python Project Template - Backend Application."""
+"""One-Stop RAG - Backend Application."""
 
 __version__ = "2.0.0"

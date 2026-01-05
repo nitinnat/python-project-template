@@ -18,13 +18,14 @@ class Settings(BaseSettings):
     )
 
     # App
-    app_name: str = Field(default="python-project-template")
+    app_name: str = Field(default="one-stop-rag")
     app_version: str = Field(default="1.0.0")
     app_env: str = Field(default="development")
     app_debug: bool = Field(default=True)
     secret_key: str = Field(default="change-this-in-production")
     log_level: str = Field(default="INFO")
     api_v1_prefix: str = Field(default="/api/v1")
+    documents_root: str = Field(default="/documents")
 
     # PostgreSQL
     postgres_host: str = Field(default="postgres")
@@ -95,7 +96,7 @@ class Settings(BaseSettings):
 
     # Observability
     otel_enabled: bool = Field(default=False)
-    otel_service_name: str = Field(default="python-project-template")
+    otel_service_name: str = Field(default="one-stop-rag")
 
     @property
     def database_url(self) -> str:
