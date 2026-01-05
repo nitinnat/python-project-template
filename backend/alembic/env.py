@@ -19,6 +19,7 @@ from app.models.postgres.base import Base
 
 # Import all models to ensure they're registered
 from app.models.postgres.feature_flag import FeatureFlag
+from app.models.postgres.rag import RagChunk, RagConversation, RagDocument, RagMessage
 
 # this is the Alembic Config object
 config = context.config

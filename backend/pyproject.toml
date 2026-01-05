@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "python-project-template"
+name = "one-stop-rag"
 version = "1.0.0"
-description = "A comprehensive Python full-stack project template"
+description = "A production-ready RAG application with document chat"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 packages = [{include = "app"}]
@@ -30,8 +30,16 @@ openai = {version = "^1.10.0", optional = true}
 anthropic = {version = "^0.8.1", optional = true}
 google-generativeai = {version = "^0.3.2", optional = true}
 litellm = {version = "^1.17.0", optional = true}
-langchain = {version = "^0.1.0", optional = true}
-langchain-openai = {version = "^0.0.2", optional = true}
+langchain = {version = "^0.3.0", optional = true}
+langchain-openai = {version = "^0.2.0", optional = true}
+
+# RAG dependencies
+markitdown = "^0.0.1a3"
+langgraph = "^0.2.76"
+tiktoken = "^0.8.0"
+pgvector = "^0.2.4"
+langchain-text-splitters = "^0.3.0"
+aiohttp = "^3.9.1"
 
 # Observability
 opentelemetry-api = "^1.22.0"
@@ -47,6 +55,7 @@ black = "^23.12.1"
 mypy = "^1.8.0"
 faker = "^22.0.0"
 httpx = "^0.26.0"
+playwright = "^1.45.0"
 
 [tool.poetry.extras]
 mongodb = ["motor"]

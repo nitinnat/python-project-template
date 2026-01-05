@@ -154,7 +154,7 @@ async def shutdown_services():
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="Python Full-Stack Project Template with FastAPI, React, and multiple databases",
+    description="One-Stop RAG with FastAPI, React, and vector-enabled data services",
     docs_url="/docs" if settings.app_debug else None,
     redoc_url="/redoc" if settings.app_debug else None,
     openapi_url="/openapi.json" if settings.app_debug else None,

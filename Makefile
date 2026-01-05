@@ -1,9 +1,9 @@
-# Makefile for Python Project Template
+# Makefile for One-Stop RAG
 .PHONY: help quickstart configure dev prod down clean logs test lint format migrate migrate-create shell db-shell
 
 # Default target
 help:
-	@echo "Python Project Template - Available Commands:"
+	@echo "One-Stop RAG - Available Commands:"
 	@echo ""
 	@echo "  make quickstart [PROFILE] - Interactive quick start (or use preset: fullstack, minimal, ai-local)"
 	@echo "  make dev          - Start development environment (requires .env)"

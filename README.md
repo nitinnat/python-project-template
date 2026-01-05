@@ -1,8 +1,10 @@
-# 🚀 Python Full-Stack Project Template
+# 🚀 One-Stop RAG
 
 <div align="center">
 
-**A production-ready, batteries-included template for building modern full-stack applications**
+**A production-ready, batteries-included RAG platform for document chat and knowledge retrieval**
+
+*We built One-Stop RAG faster by cloning our [Python Project Template](https://github.com/nitinnat/python-project-template) and tailoring it for RAG.*
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-00a393.svg)](https://fastapi.tiangolo.com)
@@ -11,7 +13,7 @@
 [![Docker](https://img.shields.io/badge/Docker-24+-2496ed.svg)](https://www.docker.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-*Clone, configure, and deploy in minutes. Not hours.*
+*Ingest, chat, and deploy in minutes. Not hours.*
 
 [Features](#-features) •
 [Quick Start](#-quick-start) •
@@ -28,6 +30,7 @@
 - [Quick Start](#-quick-start)
 - [Overview](#-overview)
 - [Features](#-features)
+- [RAG Document Chat](#-rag-document-chat)
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -57,8 +60,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/nitinnat/python-project-template.git my-awesome-app
-cd my-awesome-app
+git clone https://github.com/nitinnat/one-stop-rag.git one-stop-rag
+cd one-stop-rag
 
 # 2. Run interactive setup
 ./scripts/quick-start.sh
@@ -67,12 +70,17 @@ cd my-awesome-app
 # Frontend: http://localhost:5173
 # Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/docs
+
+# 4. Try RAG Document Chat (optional)
+# Place your documents in ./documents/ folder
+# Navigate to RAG tab → Documents → Enter "/documents" → Ingest → Chat!
 ```
 
 The interactive setup will guide you through:
 - **Service selection** - Frontend, Nginx, databases
 - **LLM provider** - Ollama (local), OpenAI, Anthropic, Google
 - **Configuration review** - Add API keys before containers start
+- **RAG document chat** - Upload documents and chat with them using local LLM
 
 **Non-interactive setup with presets:**
 ```bash
@@ -85,7 +93,7 @@ The interactive setup will guide you through:
 
 ## 🎯 Overview
 
-This template provides a **production-ready foundation** for building modern full-stack applications with Python and React. It includes:
+One-Stop RAG provides a **production-ready foundation** for document chat and RAG workflows, built on a modern Python + React stack. It includes:
 
 - ✅ **FastAPI backend** with async/await support
 - ✅ **React 18 frontend** with TypeScript and Vite
@@ -98,19 +106,19 @@ This template provides a **production-ready foundation** for building modern ful
 - ✅ **Hot reload** for rapid development
 - ✅ **Type safety** with Pydantic and TypeScript
 
-### Why This Template?
+### Why One-Stop RAG?
 
-**Problem:** Starting a new full-stack project means hours of boilerplate setup, configuration, and integration work.
+**Problem:** Building a RAG app means stitching together ingestion, embeddings, vector search, and a chat UI before you can ship.
 
-**Solution:** Clone this template and get a fully-functional, production-ready application with best practices built in.
+**Solution:** Clone One-Stop RAG and get a fully-functional, production-ready RAG stack with best practices built in.
 
 ```bash
 # Traditional approach
-⏱️  2-3 days of setup → Configure FastAPI → Setup React → Add databases →
-   Integrate auth → Configure Docker → Add monitoring → Write tests
+⏱️  2-3 days of setup → Build ingestion → Add embeddings + vector DB →
+   Wire chat UI → Configure Docker → Add monitoring → Write tests
 
-# With this template
-⏱️  5 minutes → Clone → Configure → Start → Build your features
+# With One-Stop RAG
+⏱️  5 minutes → Clone → Configure → Ingest → Chat
 ```
 
 ---
@@ -155,6 +163,44 @@ This template provides a **production-ready foundation** for building modern ful
 - **Type Safety**: Full type coverage with Pydantic and TypeScript
 - **Hot Reload**: Instant updates during development
 - **Pre-configured CI/CD**: GitHub Actions and GitLab CI templates
+
+---
+
+## 🤖 RAG Document Chat
+
+Chat with your documents using Retrieval-Augmented Generation powered by local LLMs.
+
+### Features
+- **Document Ingestion**: PDF, DOCX, PPTX, XLSX, TXT, MD support
+- **Vector Search**: PGVector with 768-dimensional embeddings
+- **Local LLM**: Fully private using Ollama (phi3 + nomic-embed-text)
+- **Conversation History**: Track and resume previous chats
+- **Source Citations**: See which documents were used for each answer
+
+### Quick Start
+
+1. **Place Documents**: Copy your files to `./documents/` folder
+   ```bash
+   cp ~/my-docs/*.pdf ./documents/
+   ```
+
+2. **Access UI**: Navigate to http://localhost:5173 → RAG tab → Documents
+
+3. **Ingest**: Enter `/documents` → Click "Load Folder" → Click "Ingest All"
+
+4. **Chat**: Switch to Chat tab and ask questions about your documents
+
+### How It Works
+
+```
+Your Documents → Chunking → Embeddings → PostgreSQL (PGVector)
+                                              ↓
+Your Question → Embedding → Similarity Search → Retrieved Context
+                                              ↓
+                                         Phi3 LLM → Answer + Sources
+```
+
+For detailed documentation, see [DOCUMENTS_GUIDE.md](DOCUMENTS_GUIDE.md).
 
 ---
 
@@ -353,7 +399,7 @@ graph LR
 ## 📁 Project Structure
 
 ```
-python-project-template/
+one-stop-rag/
 ├── backend/                      # FastAPI application
 │   ├── app/
 │   │   ├── main.py              # Application entry point
@@ -436,7 +482,7 @@ python-project-template/
 ├── docker-compose.dev.yml       # Development overrides
 ├── docker-compose.prod.yml      # Production overrides
 ├── .env                         # Environment variables and feature flags
-├── .env.example                 # Environment template
+├── .env.example                 # Environment example
 ├── Makefile                     # Development commands
 ├── README.md                    # This file
 └── TECHNICAL_DESIGN.md          # Detailed architecture docs
@@ -446,7 +492,7 @@ python-project-template/
 
 ## 🏥 Service Health Monitoring
 
-The template includes a **real-time service health monitoring dashboard** accessible at:
+One-Stop RAG includes a **real-time service health monitoring dashboard** accessible at:
 
 **http://localhost:5173/admin/health**
 
@@ -636,7 +682,7 @@ Control **application features** without restarting:
 
 ## 🤖 LLM Integration
 
-The template includes **4 LLM providers** out-of-the-box with a unified interface.
+One-Stop RAG includes **4 LLM providers** out-of-the-box with a unified interface.
 
 ### Ollama (Local LLM) - Pre-configured ✅
 
@@ -841,7 +887,7 @@ curl http://localhost:8000/health
 # Response
 {
   "status": "healthy",
-  "service": "python-project-template",
+  "service": "one-stop-rag",
   "version": "1.0.0"
 }
 ```
@@ -1047,9 +1093,10 @@ export const tasksApi = {
 **Backend** (`.env`):
 ```bash
 # Application
-APP_NAME=python-project-template
+APP_NAME=one-stop-rag
 APP_ENV=development
 SECRET_KEY=your-secret-key-change-in-production
+DOCUMENTS_ROOT=/documents
 
 # Database URLs (auto-configured in Docker)
 POSTGRES_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/app_db
@@ -1264,8 +1311,8 @@ We welcome contributions! Whether you're fixing bugs, adding features, or improv
 
 ```bash
 # 1. Fork and clone the repository
-git clone https://github.com/your-username/python-project-template.git
-cd python-project-template
+git clone https://github.com/your-username/one-stop-rag.git
+cd one-stop-rag
 
 # 2. Create a feature branch
 git checkout -b feature/amazing-feature
@@ -1305,8 +1352,8 @@ git push origin feature/amazing-feature
 
 - **Documentation:** See [TECHNICAL_DESIGN.md](TECHNICAL_DESIGN.md) for detailed architecture
 - **API Docs:** http://localhost:8000/docs (when running)
-- **Issues:** [Report bugs](https://github.com/nitinnat/python-project-template/issues)
-- **Discussions:** [Ask questions](https://github.com/nitinnat/python-project-template/discussions)
+- **Issues:** [Report bugs](https://github.com/nitinnat/one-stop-rag/issues)
+- **Discussions:** [Ask questions](https://github.com/nitinnat/one-stop-rag/discussions)
 
 ### Reporting Bugs
 
@@ -1337,8 +1384,8 @@ You are free to:
 
 ⭐ **Star this repo** if you find it helpful!
 
-[Report Bug](https://github.com/nitinnat/python-project-template/issues) •
-[Request Feature](https://github.com/nitinnat/python-project-template/issues) •
-[Discussions](https://github.com/nitinnat/python-project-template/discussions)
+[Report Bug](https://github.com/nitinnat/one-stop-rag/issues) •
+[Request Feature](https://github.com/nitinnat/one-stop-rag/issues) •
+[Discussions](https://github.com/nitinnat/one-stop-rag/discussions)
 
 </div>
