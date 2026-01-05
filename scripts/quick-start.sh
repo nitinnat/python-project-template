@@ -304,7 +304,7 @@ EOF
 
 # Main script
 echo "============================================================"
-echo "🚀 Python Full-Stack Project Template - Quick Start"
+echo "🚀 One-Stop RAG - Quick Start"
 echo "============================================================"
 echo ""
 

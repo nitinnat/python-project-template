@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { DashboardPage } from '@/pages/Dashboard';
+import { RagPage } from '@/pages/Rag';
 import { FeatureFlagsPage } from '@/pages/admin/FeatureFlags';
 import { ServiceHealthPage } from '@/pages/admin/ServiceHealth';
 
@@ -24,6 +25,7 @@ function App() {
           {/* Main routes - no auth required */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/rag" element={<RagPage />} />
           </Route>
 
           {/* Admin routes - no auth required */}

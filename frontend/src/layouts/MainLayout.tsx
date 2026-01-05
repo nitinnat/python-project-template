@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, MessageSquare } from 'lucide-react';
 
 export function MainLayout() {
   return (
@@ -12,7 +12,7 @@ export function MainLayout() {
               <Link to="/" className="flex items-center gap-2">
                 <LayoutDashboard className="w-6 h-6 text-primary-600" />
                 <span className="text-xl font-bold text-gray-900">
-                  Project Template
+                  One-Stop RAG
                 </span>
               </Link>
 
@@ -22,6 +22,13 @@ export function MainLayout() {
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  to="/rag"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Document Chat
                 </Link>
                 <Link
                   to="/admin"
@@ -45,7 +52,7 @@ export function MainLayout() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6">
+      <main className="h-[calc(100vh-4rem)]">
         <Outlet />
       </main>
     </div>

@@ -132,3 +132,5 @@ rabbitmq_data/
 
 # Documentation (excluding main docs)
 docs/
+
+.claude/
